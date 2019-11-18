@@ -6,6 +6,7 @@
 //            or another board which has PSRAM enabled
 //
 // modified by lttung1197 
+// Arduino 1.8.5 , esp32 1.0.2
 
 // Select camera model
 //#define CAMERA_MODEL_WROVER_KIT
