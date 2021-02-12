@@ -6,7 +6,21 @@
 //            or another board which has PSRAM enabled
 //
 // modified by lttung1197 
-// Arduino 1.8.5 , esp32 1.0.2
+// Arduino 1.8.13 , esp32 1.0.4
+
+// Flash Wiring
+// U0R <-> TX
+// U0T <-> RX
+// IO0 <-> GND
+// 5V  <-> 5V (better with external power supply)
+// GND <-> GND
+
+// Board: ESP32 Wrover Module
+// Upload Speed: 921600
+// Flash Frequency: 80 MHz
+// Flash Mode: QIO
+// Partition Scheme: Huge APP (3MB No OTA/1MB SPIFFS)
+// Core Debug Level: None
 
 // Select camera model
 //#define CAMERA_MODEL_WROVER_KIT
