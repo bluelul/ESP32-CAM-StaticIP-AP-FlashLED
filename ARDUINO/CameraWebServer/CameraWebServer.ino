@@ -5,7 +5,7 @@
 // WARNING!!! Make sure that you have either selected ESP32 Wrover Module,
 //            or another board which has PSRAM enabled
 //
-// modified by lttung1197 
+// modified by lttung1197 - bluelul.com
 // Arduino 1.8.13 , esp32 1.0.4
 
 // Flash Wiring
