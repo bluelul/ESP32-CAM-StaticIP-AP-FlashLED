@@ -1,5 +1,6 @@
 #include "esp_camera.h"
 #include <WiFi.h>
+#include <WiFiManager.h> // https://github.com/tzapu/WiFiManager
 
 //
 // WARNING!!! Make sure that you have either selected ESP32 Wrover Module,
@@ -32,13 +33,24 @@
 #include "camera_pins.h"
 
 const char* ssid     = "ESP32-CAM";
-const char* password = "your_password";
+const char* password = "123456789";
 
 // Set your Static IP address
 IPAddress local_IP(10, 10, 1, 1);
 // Set your Gateway IP address
 IPAddress gateway(10, 10, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
+
+////////////////////////// WIFI AUTO CONNECT VARIABLE ////////////////////////
+const char* passWifiAutoConnectAP = "c12345678";
+
+////////////////////////// WIFI AUTO CONNECT FUNC ////////////////////////
+void configModeCallback (WiFiManager *myWiFiManager) {
+  Serial.println("Entered config mode");
+  Serial.println(WiFi.softAPIP());
+  //if you used auto generated SSID, print it
+  Serial.println(myWiFiManager->getConfigPortalSSID());
+}
 
 void startCameraServer();
 
@@ -106,21 +118,48 @@ void setup() {
   s->set_hmirror(s, 1);
 #endif
 
-  // Connect to Wi-Fi network with SSID and password
-  Serial.println("Setting AP (Access Point)…");
-  // Remove the password parameter, if you want the AP (Access Point) to be open
-  WiFi.softAP(ssid, password);
-  Serial.println("Wait 100 ms for AP_START...");
-  delay(100);
+  /////// WiFiManager config ///////
+  WiFiManager wifiManager; //Local init, got free after setup() done
   
-  // Configures static IP address
-  if (!WiFi.softAPConfig(local_IP, gateway, subnet)) {
-    Serial.println("STA Failed to configure");
-  }
+  // wifiManager.resetSettings(); //reset settings - for testing
 
-  IPAddress IP = WiFi.softAPIP();
-  Serial.print("Camera Stream Ready! Connect to the ESP32 AP and go to: http://");
-  Serial.println(IP);
+  wifiManager.setCountry("JP"); // choose "JP" or "US" or "CN"
+  wifiManager.setTimeout(120); // AP timeout: shorter ~ quicker reboot after wifi lost
+  wifiManager.setClass("invert"); // web server with dark theme
+  
+  //set callback that gets called when connecting to previous WiFi fails, 
+  // and enters Access Point mode
+  wifiManager.setAPCallback(configModeCallback);
+
+  /////// WiFiManager connect ///////
+  //fetches ssid and pass and tries to connect
+  // if it does not connect it starts an access point with the specified name
+  // here  "AutoConnectAP"
+  // and goes into a blocking loop awaiting configuration
+  char ssidWifiAutoConnectAP[9] = {0};
+  sprintf(ssidWifiAutoConnectAP,"CLOG%04d",0);
+  if (wifiManager.autoConnect(ssidWifiAutoConnectAP, passWifiAutoConnectAP)) {
+    Serial.println("");
+    Serial.print("WiFi connected, Connect to your wifi network and go to: http://");  
+    Serial.println(WiFi.localIP());
+  }
+  else {
+    Serial.println("failed to connect wifi and hit timeout");
+    Serial.println("Setting AP (Access Point)…");
+    // Remove the password parameter, if you want the AP (Access Point) to be open
+    WiFi.softAP(ssid, password);
+    Serial.println("Wait 100 ms for AP_START...");
+    delay(100);
+    
+    // Configures static IP address
+    if (!WiFi.softAPConfig(local_IP, gateway, subnet)) {
+      Serial.println("STA Failed to configure");
+    }
+  
+    IPAddress IP = WiFi.softAPIP();
+    Serial.print("Camera Stream Ready! Connect to the ESP32 AP and go to: http://");
+    Serial.println(IP);   
+  }
 
   startCameraServer();  
 }
