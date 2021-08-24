@@ -24,4 +24,4 @@ Reference: https://randomnerdtutorials.com/esp32-cam-video-streaming-web-server-
 - **Core Debug Level**: None
 
 ## Wifi connect
-![fjkdla](readmeAsset/uespcam.png)
+<p align="center" width="100%"><img src="readmeAsset/uespcam.png"></p>
